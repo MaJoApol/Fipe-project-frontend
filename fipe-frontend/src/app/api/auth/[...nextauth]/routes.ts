@@ -22,7 +22,11 @@ async function refreshAccessToken(session:ISession) {
         }
 
     } catch (error) {
-        
+        console.log(error);
+        return {
+            ...session,
+            error: "RefreshAccessTokenError"
+        }
     }
 }
 
