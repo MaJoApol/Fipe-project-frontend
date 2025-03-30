@@ -13,10 +13,10 @@ const Input: React.FC<InputProps> = ({
     className = '',  ...props}) => {
 
     //Base style
-    const baseInput = 'rounded font-medium'
+    const baseInput = 'rounded font-medium box-border px-2 py-1 w-194vh h-24vh'
 
     const variantClasses = {
-        solid: 'bg-[#CFDDF4] text-white hover:bg-[#B2C6E7]',
+        solid: 'bg-[#CFDDF4] text-white hover:bg-[#B2C6E7] focus:outline-0',
         disabled: 'bg-[#CFDDF4] text-white opacity-60',
     };
 
