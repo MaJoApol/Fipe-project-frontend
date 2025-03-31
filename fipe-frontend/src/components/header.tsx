@@ -1,7 +1,8 @@
 'use client';
 
-import { UserIcon } from "@heroicons/react/20/solid";
+
 import Link from "next/link";
+import { FiUser } from "react-icons/fi";
 
 export default function Header() {
 
@@ -12,7 +13,7 @@ export default function Header() {
                 <img src="logo.png" alt="" className="h-20"/>
             </Link>
             <Link href="/auth">
-                <UserIcon className="w-13 text-[#CFDDF4] mr-10"/>
+                <FiUser className="scale-200 text-[#CFDDF4] mr-10"/>
             </Link>                 
         </div>
     </div>

@@ -2,6 +2,7 @@
 import Button, { AddButton } from "@/components/buttons";
 import Header from "@/components/header";
 import Input from "@/components/inputs";
+import Title from "@/components/titles";
 import Image from "next/image";
 
 export default function Home() {
@@ -27,11 +28,11 @@ export default function Home() {
         <p>.</p>
         <AddButton/>
         <p>.</p>
-        <Text variant="title"> <p>a</p> </Text>
+        <Title variant="title"> <p>a</p> </Title>
         <p>.</p>
-        <Text variant="label"> <p>a</p> </Text>
+        <Title variant="label"> <p>a</p> </Title>
         <p>.</p>
-        <Text variant="warn"> <p>a</p> </Text>
+        <Title variant="warn"> <p>a</p> </Title>
 
 
       </section>

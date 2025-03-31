@@ -1,4 +1,4 @@
-import { PlusIcon } from "@heroicons/react/20/solid";
+import { FaPlus } from "react-icons/fa";
 
 
 type ButtonVariant = 'solid' | 'outline';
@@ -17,15 +17,15 @@ const Button: React.FC<ButtonProps> = ({
     className = '',
     ...props
 }) => {
-    const buttonBase = 'rounded font-semibold'
+    const buttonBase = 'rounded font-semibold m-1 cursor-pointer hover:opacity-60 text-white'
 
     const variantClasses = {
-        solid: 'bg-[#002265] hover:opacity-60',
-        outline: 'box-border outline-1 outline-[#002265] text-[#002265] hover:opacity-60',
+        solid: 'bg-[#002265]',
+        outline: 'box-border outline-1 outline-[#002265] text-[#002265]',
     }
 
     const sizeClasses = {
-        sm: 'px-3 py-1 text-sm',
+        sm: 'px-6 py-1 text-sm',
         md: 'px-4 py-2 text-base',
     }
 
@@ -41,7 +41,7 @@ const Button: React.FC<ButtonProps> = ({
 export const AddButton = () => {
     return(
         <button className="rounded px-3 py-1 bg-[#002265] hover:opacity-60">
-            <PlusIcon className="text-[#fff] w-7"/>
+            <FaPlus className="text-[#fff] w-7"/>
         </button>
     )
 }

@@ -8,7 +8,7 @@ interface ContainerProps {
 
 export default function Container({ children, classNameOp }: ContainerProps) {
   return (
-    <div className={classMerge("border-1 border-black/50 rounded-2xl", classNameOp)}>
+    <div className={classMerge("p-4 border-1 border-black/50 rounded-2xl", classNameOp)}>
       {children}
     </div>
   );

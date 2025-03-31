@@ -1,6 +1,6 @@
 import React from "react"
 
-type TitleType = 'title' | 'label' | 'warn' ;
+type TitleType = 'title' | 'label' | 'warn' | 'caption' ;
 
 interface TitleProps extends React.HTMLAttributes<HTMLHeadingElement>{
     variant?: TitleType;
@@ -14,9 +14,10 @@ const Title: React.FC<TitleProps> = ({
 }) => {
 
     const variantClasses = {
-        title: 'text-lg',
-        label: 'text-md',
-        warn: 'text-sm',
+        title: 'text-4xl text-black font-semibold mt-4',
+        label: 'text-md text-black font-semibold',
+        warn: 'text-sm text-red-700',
+        caption: 'text-xs text-gray-500'
     };
 
     return (
