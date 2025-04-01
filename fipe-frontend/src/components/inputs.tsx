@@ -13,7 +13,7 @@ const Input: React.FC<InputProps> = ({
     className = '',  ...props}) => {
 
     //Base style
-    const baseInput = 'flex-grow rounded font-medium box-border px-2 py-1 mb-2 placeholder:text-sm'
+    const baseInput = 'flex-grow rounded font-medium box-border px-2 py-1 mb-1 placeholder:text-sm'
 
     const variantClasses = {
         solid: 'bg-[#CFDDF4] hover:bg-[#B2C6E7] focus:outline-0 text-black',

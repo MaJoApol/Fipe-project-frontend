@@ -41,7 +41,7 @@ const authOptions = NextAuth({
                 email: {label: "Email", type: "email", placeholder: "email@email.com"},
                 password: {label: "Senha", type:"password"}
             },
-            async authorize(credentials, req){
+            async authorize(credentials){
                 try {
                     console.log( credentials?.email)
                     console.log( credentials?.password)
@@ -66,7 +66,7 @@ const authOptions = NextAuth({
                         return null
                     }
                     
-                } catch (error: any) {
+                } catch (error) {
 
                     console.error("Erro na autenticação:", error)
                     return null

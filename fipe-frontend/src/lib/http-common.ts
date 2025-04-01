@@ -1,8 +1,8 @@
 import axios, { AxiosInstance} from "axios";
+ 
+const BASE_URL = "http://localhost:3001"
+console.log("AAAAAAAAAAAAAAAAAAAA,", BASE_URL)
 
-console.log(process.env.NEXTAUTH_URL)
-
-const BASE_URL = process.env.NEXTAUTH_URL
 export const http = axios.create({
     baseURL: BASE_URL,
     headers: {
