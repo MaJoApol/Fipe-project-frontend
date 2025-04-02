@@ -39,8 +39,7 @@ export default function LoginPage(){
             window.location.href = '/';
         }
         else{
-          console.log("OLOKO",showIncorrectModal)
-            setShowIncorrectModal(true)
+          setShowIncorrectModal(true)
         }
     }
 

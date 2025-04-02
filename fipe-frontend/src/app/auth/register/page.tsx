@@ -11,6 +11,9 @@ import { useState } from "react"
 import { FiEye, FiEyeOff } from "react-icons/fi"
 import Link from "next/link"
 import Button from "@/components/buttons"
+import Modal from "@/components/modal"
+import IError from "@/interface/IError"
+
 
 const registerSchema = z.object({
     email: z.string().email("Insira um e-mail válido"),
@@ -24,8 +27,9 @@ const registerSchema = z.object({
 
 export default function RegisterPage(){
 
-
+    const [errorMessage, setErrorMessage] = useState("Erro ao cadastrar usuário, tente novamente.") 
     const [showPassword, setShowPassword] = useState(false);
+    const [showRedirectModal, setShowRedirectModal] = useState(false);
 
     const toggleShowPassword = () => setShowPassword((prev) => !prev);
 
@@ -39,12 +43,19 @@ export default function RegisterPage(){
         try {
             const result = await http.post('/auth/register', data)
             if(result){
-
-                console.log("A")
-                
+              window.location.href = '/';
             }
-        } catch (error) {
-            console.log(error.response.data)
+        } catch (error: unknown) {
+          setShowRedirectModal(true)
+          const err = error as IError
+          if (err.response.data.error.message){
+            setErrorMessage(err.response.data.error.message + err.response.data.error.context)
+            console.log(err.response.data.error.message)
+            return errorMessage
+          }
+          else{
+            return errorMessage
+          }
         }
         
   
@@ -126,7 +137,8 @@ export default function RegisterPage(){
 
                         <div className="w-full min-h-[70px]">
                             <Title variant="label" className="text-left">Data de nascimento</Title>
-                            <Input variant="solid" type="date" className="w-full custom-date-placeholder [&:-webkit-autofill]:shadow-[0_0_0_1000px_#CFDDF4_inset]" {...register('birthdate')}></Input>
+                          
+                              <Input variant="solid" className="empty w-full custom-date-placeholder [&:-webkit-autofill]:shadow-[0_0_0_1000px_#CFDDF4_inset]"></Input>
                             {errors.birthdate?.message && (<Title variant="warn">{errors.birthdate?.message}</Title>)}
                         </div>
                     </div>
@@ -152,6 +164,22 @@ export default function RegisterPage(){
 
 
           </Container>
+
+          {showRedirectModal && (
+            <Modal>
+              <Container classNameOp="flex flex-col bg-white justify-center items-center w-3/10 h-4/10 gap-5">
+                <Title variant="title">
+                  Falha ao cadastrar
+                </Title>
+                <Title>
+                  {errorMessage}
+                </Title>
+                <Button size="sm" onClick={() => {window.location.href = '/auth/login'}} > 
+                  Sair
+                </Button>
+              </Container>
+            </Modal>
+          )} 
 
         </main>
       </div>
