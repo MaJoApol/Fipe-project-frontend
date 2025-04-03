@@ -2,19 +2,23 @@ import { IModels } from "@/interface/IModels";
 import { http } from "@/lib/http-common";
 import { useQuery } from 'react-query';
 
-export const useModels = () => {
+export const useModels = (brandId?: string) => {
 
+   
     const getModels = async(): Promise<IModels[]> => {
-        const {data} =  await http.get(`/models/get`)
+        if (!brandId) return []
+        const {data} =  await http.get(`/models/get/${brandId}`)
         return data.models
     }
 
     const {
         data: models,
-        isLoading,
-    } = useQuery<IModels[], Error>('models', getModels) 
+    } = useQuery<IModels[], Error>(['models', brandId], getModels, {enabled: !!brandId, initialData: []}) 
 
-    return {models, isLoading}
+    return {
+        models,
+
+    }
     
 }
 
