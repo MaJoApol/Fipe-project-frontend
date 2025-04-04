@@ -8,47 +8,82 @@ import Title from "@/components/titles";
 import { useBrands } from "@/hooks/useBrands";
 import { useModels } from "@/hooks/useModels";
 import { useVehicles } from "@/hooks/useVehicles";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+export type FilterTypes = {
+    fuelTypeFilter: string,
+    vehicleYearFilter: string | number,
+    //referenceMonth: string,
+   // referenceYear: string
+}
 
 export default function Home(){
-  
+
     const [values, setValues] = useState({
         brand: '',
         model: '',
     })
 
-    const [filterValues, setFilterValues] = useState({
-        fuelType: '',
-        vehicleYear: '',
-        referenceMonth: '',
-        referenceYear: ''
-    })
+
+   const [vehicleYearsOptions, setVehicleYearsOptions] = useState<number[]>([])
+   const [vehicleYearFilter, setVehicleYearFilter] = useState('')
+
+    type FuelType = {
+        fuelTypeId: string;
+        fuelTypeName: string;
+    };
+    const [fuelTypeFilter, setFuelTypeFilter] = useState('');
+    const [fuelTypesOptions, setFuelTypesOptions] = useState<FuelType[]>([]);
+
+
+    const filterValues = {
+        fuelTypeFilter,
+        vehicleYearFilter
+    }
 
     const { brands, isLoading } = useBrands();
     const { models } = useModels(values.brand);
-    const { vehicles } = useVehicles(values.model, filterValues)
+    const { vehicles } = useVehicles(filterValues, values.model)
  
-    const fuelTypes = vehicles?.length ? [...new Map( // retorna valores unicos
-        vehicles.map(vehicle => [
-            vehicle.fuelTypeId,
+    useEffect(() => {
+        if (!vehicles) return 
+
+        setFuelTypesOptions([...new Map(
+            vehicles.map(vehicle => [
+                vehicle.fuelTypeId,
             {
                 fuelTypeId: vehicle.fuelTypeId,
                 fuelTypeName: vehicle.fuelType.name
-            }
-        ])
-    ).values()] : [];
+        }])).values()]);
+        
+    }, [vehicles])
+    
+    useEffect(() => {
+        if (!vehicles) return
+        setVehicleYearsOptions([... new Set(vehicles.map(vehicle => vehicle.vehicleYear))])
+    }, [vehicles])
 
-    console.log(fuelTypes)
 
     function handleSelectChange(event: React.ChangeEvent<HTMLSelectElement>) {
-        const { name, id, value } = event.target;
-        if (name === 'filters') {
-            setFilterValues({...filterValues, [id]: value})
-        }
-        else{
-            setValues({...values, [id]: value})
+        const { id, value } = event.target;
+
+        switch (id){
+            case 'fuelTypeId':
+                setFuelTypeFilter(value);
+                break;
+            case 'vehicleYear':
+                setVehicleYearFilter(value); 
+                break;
+            case 'brand':
+                setValues({...values, [id]: value})
+                break;
+            case 'model':   
+                setValues({...values, [id]: value})
+                break;
+
         }
     }
+    console.log("VEÍCULOS: ", vehicles)
 
     if (isLoading)
         { return(<p>carregando</p>)}
@@ -62,8 +97,8 @@ export default function Home(){
                             Consultar tabela Fipe
                         </Title>
 
-                        <Select id="brand" defaultValue={''} placeholder={"Selecione uma marca..."} value={values.brand} onChange={handleSelectChange}>
-                            {!isLoading  &&
+                        <Select id="brand" placeholder={"Selecione uma marca..."} value={values.brand} onChange={handleSelectChange}>
+                            {
                                 (brands?.map((brand) => (
                                     <option value={brand.id} key={brand.id}>
                                         {brand.name}
@@ -72,8 +107,8 @@ export default function Home(){
                             }
                         </Select>
                         
-                        <Select id="model" defaultValue={''} placeholder={"Selecione um modelo..."} value={values.model} onChange={handleSelectChange}>
-                            {!isLoading  &&
+                        <Select id="model" placeholder={"Selecione um modelo..."} value={values.model} onChange={handleSelectChange}>
+                            {
                                 (models?.map((model) => (
                                     <option value={model.id} key={model.id}>
                                         {model.name}
@@ -82,28 +117,28 @@ export default function Home(){
                             }
                         </Select>
 
-                        <Select name="filters" id="fuelType" defaultValue={''} placeholder={"Selecione um combustível..."} value={filterValues.fuelType} onChange={handleSelectChange}>
-                        {!isLoading  &&
-                                (fuelTypes?.map((fuelType) => (
-                                    <option value={fuelType.fuelTypeId} key={fuelType.fuelTypeId}>
-                                        {fuelType.fuelTypeName}
+                        <Select name="filters" id="fuelTypeId" placeholder={"Selecione um combustível..."} value={fuelTypeFilter} onChange={handleSelectChange}>
+                        {
+                                (fuelTypesOptions?.map((fuelTypesOption) => (
+                                    <option value={fuelTypesOption.fuelTypeId} key={fuelTypesOption.fuelTypeId}>
+                                         {fuelTypesOption.fuelTypeName}
+                                    </option>
+                                )))
+                            }
+                        </Select>
+ 
+                        <Select name="filters" id="vehicleYear" placeholder={"Selecione o ano..."} value={vehicleYearFilter} onChange={handleSelectChange}>
+                        {
+                                (vehicleYearsOptions?.map((vehicleYearsOption) => (
+                                    <option value={vehicleYearsOption} key={vehicleYearsOption}>
+                                         {vehicleYearsOption}
                                     </option>
                                 )))
                             }
                         </Select>
 
-                        <Select name="filters" id="vehicleYear" defaultValue={''} placeholder={"Selecione o ano..."} value={filterValues.vehicleYear} onChange={handleSelectChange}>
-                        {!isLoading  &&
-                                (fuelTypes?.map((fuelType) => (
-                                    <option value={fuelType.fuelTypeId} key={fuelType.fuelTypeId}>
-                                        {fuelType.fuelTypeName}
-                                    </option>
-                                )))
-                            }
-                        </Select>
-
-                        <Select name="filters" id="referenceMonth" defaultValue={''} placeholder={"Selecione um mês de referência..."} value={filterValues.referenceMonth} onChange={handleSelectChange}>
-                        {!isLoading  &&
+                        {/* <Select name="filters" id="referenceMonth" defaultValue={''} placeholder={"Selecione um mês de referência..."} value={filterValues.referenceMonth} onChange={handleSelectChange}>
+                        {
                                 (fuelTypes?.map((fuelType) => (
                                     <option value={fuelType.fuelTypeId} key={fuelType.fuelTypeId}>
                                         {fuelType.fuelTypeName}
@@ -113,16 +148,16 @@ export default function Home(){
                         </Select>
 
                         <Select name="filters" id="referenceYear" defaultValue={''} placeholder={"Selecione um combustível..."} value={filterValues.referenceYear} onChange={handleSelectChange}>
-                        {!isLoading  &&
+                        {
                                 (fuelTypes?.map((fuelType) => (
                                     <option value={fuelType.fuelTypeId} key={fuelType.fuelTypeId}>
                                         {fuelType.fuelTypeName}
                                     </option>
                                 )))
                             }
-                        </Select>
+                        </Select> */}
 
-                        <Button>
+                        <Button onClick={() => (handleSelectChange)} >
                             Pesquisar
                         </Button>
                     </Container>
