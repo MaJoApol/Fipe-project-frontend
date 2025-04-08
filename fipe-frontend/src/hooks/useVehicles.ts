@@ -17,7 +17,7 @@ export const useVehicles = ( modelId?: string, filterValues?: FilterTypes ) => {
             filterValues?.vehicleYearFilter !== 0 || 
             filterValues?.referenceYearFilter !== '' || 
             filterValues?.referenceMonthFilter !== '' || 
-            filterValues?.fuelTypeFilter !== ''
+            filterValues?.fuelTypeIdFilter !== ''
         )
         {
             const {data} = await http.post(`/vehicles/get/${modelId}`, filterValues)
@@ -37,6 +37,21 @@ export const useVehicles = ( modelId?: string, filterValues?: FilterTypes ) => {
 
     }
 
+    const getVehiclesWithoutHistoric  = async(): Promise<IVehicles[]> => {
+        if (!modelId) return []
+        if (
+            filterValues?.vehicleYearFilter !== 0 || 
+            filterValues?.fuelTypeIdFilter !== ''
+        )
+        {
+            const {data} = await http.post(`/vehicles/get/${modelId}`, filterValues)
+            return data.vehicles  
+        }
+        else{
+            return [] 
+        }
+    }
+
     const {
         data: vehiclesResponse,
     } = useQuery<IVehicles[], Error>(['vehicles', modelId, filterValues], getAllVehicles, {enabled: !!modelId , initialData: []}) 
@@ -45,10 +60,15 @@ export const useVehicles = ( modelId?: string, filterValues?: FilterTypes ) => {
         data: vehiclesFilterdByModel,
     } = useQuery<IVehicles[], Error>(['vehicles', modelId], getVehiclesByModel, {enabled: !!modelId , initialData: []}) 
 
+    const {
+        data: vehiclesWithoutHistoric,
+    } = useQuery<IVehicles[], Error>(['vehicles', modelId], getVehiclesWithoutHistoric, {enabled: !!modelId , initialData: []}) 
+
 
     return {
         vehiclesResponse,
-        vehiclesFilterdByModel
+        vehiclesFilterdByModel,
+        vehiclesWithoutHistoric
     }
     
 }
