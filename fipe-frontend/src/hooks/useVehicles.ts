@@ -1,4 +1,3 @@
-
 import { FilterTypes } from "@/app/(main)/page";
 import { IVehicles } from "@/interface/IVehicles";
 import { http } from "@/lib/http-common";
@@ -8,7 +7,6 @@ export const useVehicles = ( modelId?: string, filterValues?: FilterTypes ) => {
 
     if (filterValues?.vehicleYearFilter) {
         filterValues.vehicleYearFilter = Number(filterValues?.vehicleYearFilter)
-  
     }
    
     const getAllVehicles = async(): Promise<IVehicles[]> => {
@@ -28,24 +26,25 @@ export const useVehicles = ( modelId?: string, filterValues?: FilterTypes ) => {
         }
     }
 
-
     const getVehiclesByModel = async(): Promise<IVehicles[]> => {
         if (!modelId) return []
-
         const {data} = await http.post(`/vehicles/get/${modelId}`)
         return data.vehicles
-
     }
 
     const getVehiclesWithoutHistoric  = async(): Promise<IVehicles[]> => {
         if (!modelId) return []
+        if (!filterValues) return []
+        const partialFilter: (string | number)[] = [];
+        
         if (
             filterValues?.vehicleYearFilter !== 0 || 
             filterValues?.fuelTypeIdFilter !== ''
         )
         {
-            const {data} = await http.post(`/vehicles/get/${modelId}`, filterValues)
-            return data.vehicles  
+            partialFilter.push(filterValues?.vehicleYearFilter, filterValues?.fuelTypeIdFilter)
+            const {data} = await http.post(`/vehicles/get/${modelId}`, partialFilter)
+            return data.vehicles
         }
         else{
             return [] 
@@ -62,16 +61,11 @@ export const useVehicles = ( modelId?: string, filterValues?: FilterTypes ) => {
 
     const {
         data: vehiclesWithoutHistoric,
-    } = useQuery<IVehicles[], Error>(['vehicles', modelId], getVehiclesWithoutHistoric, {enabled: !!modelId , initialData: []}) 
-
+    } = useQuery<IVehicles[], Error>(['vehicles', modelId, filterValues], getVehiclesWithoutHistoric, {enabled: !!modelId , initialData: []}) 
 
     return {
         vehiclesResponse,
         vehiclesFilterdByModel,
         vehiclesWithoutHistoric
     }
-    
 }
-
-
-

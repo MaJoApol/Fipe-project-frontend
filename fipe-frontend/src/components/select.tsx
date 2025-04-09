@@ -31,7 +31,7 @@ export const Select: React.FC<SelectProps> = ({children, placeholder, classNameO
     const variantClasses = {
         default: ( 
             <>
-                <select className={classMerge(` !bg-[#CFDDF4] p-2 text-sm w-full rounded appearance-none ${value === '' ? "text-black/50" : "text-black"}`, classNameOp)}value={value}{...props} >
+                <select className={classMerge(` !bg-[#CFDDF4] p-2 text-sm w-full rounded cursor-pointer appearance-none ${value === '' ? "text-black/50" : "text-black"}`, classNameOp)}value={value}{...props} >
                     <option value={''} disabled className="text-black/50">{placeholder}</option>
                     {children}
                 </select>
@@ -51,7 +51,7 @@ export const Select: React.FC<SelectProps> = ({children, placeholder, classNameO
             
         small: ( 
             <>
-                <select className={classMerge(` !bg-[#CFDDF4] pl-2 text-sm w-15 h-8 rounded appearance-none ${value === '' ? "text-black/50" : "text-black"}`, classNameOp)}value={value}{...props} >
+                <select className={classMerge(` !bg-[#ffff] pl-2 text-sm w-15 h-8  cursor-pointer rounded appearance-none ${value === '' ? "text-black/50" : "text-black"}`, classNameOp)}value={value}{...props} >
                     <option value={''} disabled className="text-black/50">{placeholder}</option>
                     {children}
                 </select>

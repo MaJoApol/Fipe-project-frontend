@@ -4,7 +4,7 @@ import React from "react";
 
 export default function Container({ children, classNameOp }: IComponents) {
   return (
-    <div className={classMerge("p-4 border-1 border-[#002265]/50 rounded-2xl", classNameOp)}>
+    <div className={classMerge("p-4 border-2 border-[#002265]/50 rounded-2xl", classNameOp)}>
       {children}
     </div>
   );
