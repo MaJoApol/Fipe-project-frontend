@@ -5,12 +5,12 @@ import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { ILogin } from "@/interface/ILogin";
-import Container from "@/components/container";
+import Container from "@/components/container/container";
 import Input from "@/components/inputs";
 import Title from "@/components/titles";
 import Link from "next/link";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import Button from "@/components/buttons";
+import Button from "@/components/Button/buttons";
 
 const loginschema = z.object({
     email: z.string().email("Insira uma e-mail válido"),

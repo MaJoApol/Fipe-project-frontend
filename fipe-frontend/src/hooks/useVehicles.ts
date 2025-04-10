@@ -12,17 +12,15 @@ export const useVehicles = ( modelId?: string, filterValues?: FilterTypes ) => {
     const getAllVehicles = async(): Promise<IVehicles[]> => {
         if (!modelId) return []
         if (
-            filterValues?.vehicleYearFilter !== 0 || 
-            filterValues?.referenceYearFilter !== '' || 
-            filterValues?.referenceMonthFilter !== '' || 
+            filterValues?.vehicleYearFilter !== 0 ||
             filterValues?.fuelTypeIdFilter !== ''
         )
         {
             const {data} = await http.post(`/vehicles/get/${modelId}`, filterValues)
-            return data.vehicles  
+            return data.vehicles
         }
         else{
-            return [] 
+            return []
         }
     }
 

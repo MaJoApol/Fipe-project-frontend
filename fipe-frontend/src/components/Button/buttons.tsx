@@ -17,10 +17,10 @@ const Button: React.FC<ButtonProps> = ({
     className = '',
     ...props
 }) => {
-    const buttonBase = 'rounded font-semibold m-1 cursor-pointer hover:opacity-60 text-white'
+    const buttonBase = 'rounded font-semibold m-1 cursor-pointer hover:opacity-60'
 
     const variantClasses = {
-        solid: 'bg-[#002265]',
+        solid: 'bg-[#002265] text-white',
         outline: 'box-border outline-1 outline-[#002265] text-[#002265]',
     }
 

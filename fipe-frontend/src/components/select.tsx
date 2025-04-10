@@ -9,7 +9,7 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement>{
     children: React.ReactNode;
     classNameOp?: string;
     placeholder?: string | number;
-    onClear?: () => void;
+    onClear?: (e: React.MouseEvent) => void;
     variant?: SelectVariant;
 }
 
@@ -27,6 +27,12 @@ export const Select: React.FC<SelectProps> = ({children, placeholder, classNameO
             setIsSelected(false)
         }
     }, [value, onClear])
+
+    const handleClear = (e: React.MouseEvent) => {
+        e.stopPropagation()
+        e.preventDefault()
+        onClear?.(e)
+    }
 
     const variantClasses = {
         default: ( 
@@ -47,7 +53,7 @@ export const Select: React.FC<SelectProps> = ({children, placeholder, classNameO
 
 
                 <div className="absolute z-10 top-0 right-0 flex items-center justify-center w-10 h-full ">
-                    <button onClick={onClear}>
+                    <button onClick={handleClear}>
                         {isSelected ? (
                             <FiX className="cursor-pointer"></FiX>
                         ) :

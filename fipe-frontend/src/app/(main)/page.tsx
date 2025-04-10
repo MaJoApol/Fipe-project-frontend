@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client'
-import Button from "@/components/buttons";
-import Container from "@/components/container";
+import Button from "@/components/Button/buttons";
+import Container from "@/components/container/container";
 import Header from "@/components/header";
 import { Select } from "@/components/select";
 
@@ -15,9 +15,7 @@ import { useMediaQuery } from 'react-responsive';
 
 export type FilterTypes = {
     fuelTypeIdFilter: string,
-    vehicleYearFilter: string | number,
-    referenceMonthFilter: string | number,
-    referenceYearFilter: string | number
+    vehicleYearFilter: string | number
 }
 
 export default function Home() {
@@ -25,20 +23,16 @@ export default function Home() {
     const isMobile = useMediaQuery({ maxWidth: 768 })
 
     const [vehicleYearFilter, setVehicleYearFilter] = useState('')
-
     const [fuelTypeIdFilter, setFuelTypeIdFilter] = useState('');
 
     const [referenceMonthFilter, setReferenceMonthFilter] = useState('');
     const [referenceMonthOptions, setReferenceMonthOptions] = useState<number[]>([]);
-    
     const [referenceYearFilter, setReferenceYearFilter] = useState('');
     const [referenceYearOptions, setReferenceYearOptions] = useState<number[]>([]);
 
     const filterValues = { //maybe change for fueltypeId, and change Filter for Selected
         fuelTypeIdFilter,
-        vehicleYearFilter,
-        referenceMonthFilter,
-        referenceYearFilter
+        vehicleYearFilter
     }
 
     const [values, setValues] = useState({
@@ -56,7 +50,6 @@ export default function Home() {
         return vehiclesResponse.filter(v => v.modelId === values.model);
     }, [vehiclesResponse, values.model]);
 
-    
     const fuelTypesOptions = useMemo(() => {
         if (!filteredByModels.length) return [];
         return [...new Map(
@@ -69,12 +62,12 @@ export default function Home() {
             ])
         ).values()];
     }, [filteredByModels]);
+  
 
     const vehicleYearsOptions = useMemo(() => {
         if (!filteredByModels.length) return [];
         return [...new Set(filteredByModels.map(vehicle => vehicle.vehicleYear))].sort((a, b) => b - a);
     }, [filteredByModels]);
-
 
     const filteredFuelTypes = useMemo(() => {
         if (!vehicleYearFilter) return fuelTypesOptions;
@@ -85,7 +78,6 @@ export default function Home() {
             )
         );
     }, [vehicleYearFilter, fuelTypesOptions, filteredByModels]);
-
 
     const filteredVehiclesYears = useMemo(() => {
         if (!fuelTypeIdFilter) return vehicleYearsOptions;
@@ -100,16 +92,11 @@ export default function Home() {
     const fuelTypesToShow = vehicleYearFilter ? filteredFuelTypes : fuelTypesOptions;
     const vehicleYearsToShow = fuelTypeIdFilter ? filteredVehiclesYears : vehicleYearsOptions;
 
-    const filteredByFilters = useMemo(() => {
-        if (!fuelTypeIdFilter || !vehicleYearFilter) return [];
-        return vehiclesResponse?.filter(v => v.modelId === values.model);
-    }, [fuelTypeIdFilter, vehicleYearFilter]);
-   
-
     useEffect(() => {
         if (fuelTypeIdFilter && vehicleYearFilter) {
-            const referenceYears = [...new Set(filteredByFilters?.map(vehicle => vehicle.referenceYear))].sort((a, b) => b - a);
+            const referenceYears = [...new Set(vehiclesResponse?.map(vehicle => vehicle.referenceYear))].sort((a, b) => b - a);
             setReferenceYearOptions(referenceYears);
+            console.log(vehiclesResponse)
 
             if (referenceYears.length > 0 && (!referenceYearFilter || !referenceYears.includes(Number(referenceYearFilter)))) {
                 const mostRecentYear = referenceYears[0];
@@ -117,11 +104,12 @@ export default function Home() {
             }
         }
        
-    }, [fuelTypeIdFilter, vehicleYearFilter, filteredByFilters]);
+    }, [vehiclesResponse]);
 
     useEffect(() => {
         if (referenceYearFilter) {
-            const monthFilteredByYear = filteredByFilters?.filter(vehicle => vehicle.referenceYear === Number(referenceYearFilter));
+            const monthFilteredByYear = vehiclesResponse?.filter(vehicle => vehicle.referenceYear === Number(referenceYearFilter));
+            console.log({vehiclesResponse})
             const referenceMonths = [...new Set(monthFilteredByYear?.map(vehicle => vehicle.referenceMonth))].sort((a, b) => b - a);
             setReferenceMonthOptions(referenceMonths);
 
@@ -129,7 +117,7 @@ export default function Home() {
                 setReferenceMonthFilter(referenceMonths[0].toString()); // Atualiza o filtro com o mês mais recente
             }
         }
-    }, [referenceYearFilter, filteredByFilters]);
+    }, [referenceYearFilter]);
 
     useEffect(() => {
         setVehicleYearFilter('')
@@ -143,11 +131,14 @@ export default function Home() {
     const [showValue, setShowValue] = useState(false);
 
     useEffect(() => {
-        if (vehiclesResponse?.length === 1) {
-            setCarValueResponse(vehiclesResponse?.[0].value)
+        if ( referenceMonthFilter && referenceYearFilter) {
+            const carValueResponse = vehiclesResponse?.filter((vehicle => vehicle.referenceYear === Number(referenceYearFilter) && vehicle.referenceMonth === Number(referenceMonthFilter)))
+            
+            if (carValueResponse) {
+                setCarValueResponse(carValueResponse[0].value)
+            }
         }
-
-    }, [vehiclesResponse])
+    }, [referenceMonthFilter, referenceYearFilter])
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -205,7 +196,7 @@ export default function Home() {
                                             </Title>
                                         </div>
                                         <div className="flex flex-col pt-7 pb-4 h-full w-4/5 justify-around">
-                                            <Select id="brand" placeholder={"Selecione uma marca..."} onClear={() => setValues({ ...values, brand: '' })} value={values.brand} onChange={handleSelectChange}>
+                                            <Select id="brand" placeholder={"Selecione uma marca..."} onClear={() => {setValues({ ...values, brand: '', model: ''}); ; setShowValue(false)}} value={values.brand} onChange={handleSelectChange}>
                                                 {
                                                     (brands?.map((brand) => (
                                                         <option value={brand.id} key={brand.id}>
@@ -215,7 +206,7 @@ export default function Home() {
                                                 }
                                             </Select>
 
-                                            <Select id="model" placeholder={"Selecione um modelo..."} value={values.model} onClear={() => setValues({ ...values, model: '' })} onChange={handleSelectChange}>
+                                            <Select id="model" placeholder={"Selecione um modelo..."} value={values.model} onClear={() => {setValues({ ...values, model: '' }); setShowValue(false)}} onChange={handleSelectChange}>
                                                 {models ? (
                                                     models.map((model) => (
                                                         <option value={model.id} key={model.id}>
@@ -226,7 +217,7 @@ export default function Home() {
                                             </Select>
 
                                             <div className="flex flex-row w-full justify-between">
-                                                <Select id="fuelTypeId" classNameOp="!w-80" placeholder={"Selecione um combustível..."} onClear={() => { setFuelTypeIdFilter(''); setVehicleYearFilter('') }} value={fuelTypeIdFilter} onChange={handleSelectChange}>
+                                                <Select id="fuelTypeId" classNameOp="!w-80" placeholder={"Selecione um combustível..."} onClear={() => { setFuelTypeIdFilter(''); setVehicleYearFilter(''); setShowValue(false) }} value={fuelTypeIdFilter} onChange={handleSelectChange}>
                                                     {
                                                         (fuelTypesToShow?.map((fuelTypesOption) => (
                                                             <option value={fuelTypesOption.fuelTypeId} key={fuelTypesOption.fuelTypeId}>
@@ -236,7 +227,8 @@ export default function Home() {
                                                     }
                                                 </Select>
 
-                                                <Select id="vehicleYear" classNameOp="!w-120" placeholder={"Selecione o ano..."} value={vehicleYearFilter} onClear={() => { setFuelTypeIdFilter(''); setVehicleYearFilter('') }} onChange={handleSelectChange}>
+                                                <Select id="vehicleYear" classNameOp="!w-120" placeholder={"Selecione o ano..."} value={vehicleYearFilter} onClear={() => { setFuelTypeIdFilter(''); setVehicleYearFilter(''); setShowValue(false)
+}} onChange={handleSelectChange}>
                                                     {
                                                         (vehicleYearsToShow?.map((vehicleYearsOption) => (
                                                             <option value={vehicleYearsOption} key={vehicleYearsOption}>
@@ -276,7 +268,7 @@ export default function Home() {
                                                 {vehicleYearFilter && fuelTypeIdFilter ?
                                                     (
                                                         <>
-                                                            <Select id="referenceMonth" variant="small" placeholder={"Mês"} onClear={() => setReferenceMonthFilter('')} value={referenceMonthFilter} onChange={handleSelectChange}>
+                                                            <Select id="referenceMonth" variant="small" placeholder={"Mês"} onClear={() => {setReferenceMonthFilter(''); setShowValue(false)}} value={referenceMonthFilter} onChange={handleSelectChange}>
                                                                 {
                                                                     (referenceMonthOptions?.map((referenceMonthOption) => (
                                                                         <option value={referenceMonthOption} key={referenceMonthOption}>
@@ -292,7 +284,8 @@ export default function Home() {
                                                                 id="referenceYear"
                                                                 variant="small"
                                                                 placeholder={"Ano"}
-                                                                onClear={() => setReferenceYearFilter('')}
+                                                                onClear={() => {setReferenceYearFilter(''); setReferenceMonthFilter(''); setShowValue(false)
+                                                                }}
                                                                 value={referenceYearFilter}
                                                                 onChange={handleSelectChange}
                                                             >
@@ -343,7 +336,7 @@ export default function Home() {
                                             </Title>
                                         </div>
                                         <div className="flex flex-col flex-auto pt-4 pb-4 h-full w-6/7 justify-around">
-                                            <Select id="brand" placeholder={"Selecione uma marca..."} onClear={() => setValues({ ...values, brand: '' })} value={values.brand} onChange={handleSelectChange}>
+                                            <Select id="brand" placeholder={"Selecione uma marca..."} onClear={() => {setValues({ ...values, brand: '', model: ''}); ; setShowValue(false)}} value={values.brand} onChange={handleSelectChange}>
                                                 {
                                                     (brands?.map((brand) => (
                                                         <option value={brand.id} key={brand.id}>
@@ -353,7 +346,7 @@ export default function Home() {
                                                 }
                                             </Select>
 
-                                            <Select id="model" placeholder={"Selecione um modelo..."} value={values.model} onClear={() => setValues({ ...values, model: '' })} onChange={handleSelectChange}>
+                                            <Select id="model" placeholder={"Selecione um modelo..."} value={values.model} onClear={() => {setValues({ ...values, model: '' }); setShowValue(false)}} onChange={handleSelectChange}>
                                                 {models ? (
                                                     models.map((model) => (
                                                         <option value={model.id} key={model.id}>
@@ -363,7 +356,7 @@ export default function Home() {
                                                 ) : null}
                                             </Select>
 
-                                            {/*<Select id="fuelTypeId" placeholder={"Selecione um combustível..."}  onClear={() => setFuelTypeIdFilter('')} value={fuelTypeIdFilter} onChange={handleSelectChange}>
+                                            <Select id="fuelTypeId" placeholder={"Selecione um combustível..."}  onClear={() => { setFuelTypeIdFilter(''); setVehicleYearFilter(''); setShowValue(false)}} value={fuelTypeIdFilter} onChange={handleSelectChange}>
                                                 {
                                                     (fuelTypesToShow?.map((fuelTypesOption) => (
                                                         <option value={fuelTypesOption.fuelTypeId} key={fuelTypesOption.fuelTypeId}>
@@ -373,7 +366,7 @@ export default function Home() {
                                                 }
                                             </Select>
                     
-                                            <Select id="vehicleYear" placeholder={"Selecione o ano..."} value={vehicleYearFilter} onClear={() => setVehicleYearFilter('')} onChange={handleSelectChange}>
+                                            <Select id="vehicleYear" placeholder={"Selecione o ano..."} value={vehicleYearFilter} onClear={() => { setFuelTypeIdFilter(''); setVehicleYearFilter(''); setShowValue(false)}} onChange={handleSelectChange}>
                                                 { 
                                                     (vehicleYearsToShow?.map((vehicleYearsOption) => (
                                                         <option value={vehicleYearsOption} key={vehicleYearsOption}>
@@ -397,7 +390,7 @@ export default function Home() {
                                                     </Button>
                                                 </div>   
                                             )}
-                                             */}
+                                             
                                         </div>
 
                                         <div className="bg-[#CFDDF4] w-full min-h-31 rounded-bl-2xl rounded-br-2xl p-3 flex flex-col justify-end items-center">
@@ -409,45 +402,46 @@ export default function Home() {
                                                 <Title variant="caption" className="text-black">Data de referência: </Title>
                                                 {vehicleYearFilter && fuelTypeIdFilter ?
                                                     (
-                                                        <>
-                                                            <Select id="referenceMonth" variant="small" placeholder={"Mês"} onClear={() => setReferenceMonthFilter('')} value={referenceMonthFilter} onChange={handleSelectChange}>
-                                                                {
-                                                                    (referenceMonthOptions?.map((referenceMonthOption) => (
-                                                                        <option value={referenceMonthOption} key={referenceMonthOption}>
-                                                                            {referenceMonthOption}
-                                                                        </option>
-                                                                    )))
-                                                                }
-                                                            </Select>
-                                                            <Title variant="caption" className="text-black">/</Title>
+                                                      <>
+                                                      <Select id="referenceMonth" variant="small" placeholder={"Mês"} onClear={() => {setReferenceMonthFilter(''); setShowValue(false)}} value={referenceMonthFilter} onChange={handleSelectChange}>
+                                                          {
+                                                              (referenceMonthOptions?.map((referenceMonthOption) => (
+                                                                  <option value={referenceMonthOption} key={referenceMonthOption}>
+                                                                      {referenceMonthOption}
+                                                                  </option>
+                                                              )))
+                                                          }
+                                                      </Select>
+                                                      <Title variant="caption" className="text-black">/</Title>
 
 
-                                                            <Select
-                                                                id="referenceYear"
-                                                                variant="small"
-                                                                placeholder={"Ano"}
-                                                                onClear={() => setReferenceYearFilter('')}
-                                                                value={referenceYearFilter}
-                                                                onChange={handleSelectChange}
-                                                            >
-                                                                {
-                                                                    referenceYearOptions?.map((referenceYearOption) => (
-                                                                        <option value={referenceYearOption} key={referenceYearOption}>
-                                                                            {referenceYearOption}
-                                                                        </option>
-                                                                    ))
-                                                                }
-                                                            </Select>
-                                                        </>
+                                                      <Select
+                                                          id="referenceYear"
+                                                          variant="small"
+                                                          placeholder={"Ano"}
+                                                          onClear={() => {setReferenceYearFilter(''); setReferenceMonthFilter(''); setShowValue(false)
+                                                          }}
+                                                          value={referenceYearFilter}
+                                                          onChange={handleSelectChange}
+                                                      >
+                                                          {
+                                                              referenceYearOptions?.map((referenceYearOption) => (
+                                                                  <option value={referenceYearOption} key={referenceYearOption}>
+                                                                      {referenceYearOption}
+                                                                  </option>
+                                                              ))
+                                                          }
+                                                      </Select>
+                                                  </>
                                                     ) : (
                                                         <>
-                                                            <Select variant="small" placeholder={"Mês"} classNameOp="!bg-[#CFDDF4] !w-10 text-xs pointer-events-none" disabled value={''}>
+                                                            <Select variant="smallUnactive" placeholder={"Mês"} classNameOp="!bg-[#CFDDF4] !w-10 text-xs pointer-events-none" disabled value={''}>
                                                                 {null}
                                                             </Select>
                                                             <Title variant="caption" className="text-black">/</Title>
 
 
-                                                            <Select variant="small" placeholder={"Ano"} classNameOp="!bg-[#CFDDF4] !w-10 text-xs pointer-events-none" disabled value={''}>
+                                                            <Select variant="smallUnactive" placeholder={"Ano"} classNameOp="!bg-[#CFDDF4] !w-10 text-xs pointer-events-none" disabled value={''}>
                                                                 {null}
                                                             </Select></>
                                                     )}
